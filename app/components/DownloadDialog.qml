@@ -61,6 +61,9 @@ Dialog {
         target: drives
         onSelectedChanged: {
             writeImmediately.checked = false
+            if (drives.selected) {
+                drives.selected.persistentStorage(persistentStorage.checked)
+            }
         }
     }
 
@@ -169,13 +172,6 @@ Dialog {
                     target: progressBar;
                     value: drives.selected.progress.ratio;
                     progressColor: Qt.lighter("green")
-                }
-                PropertyChanges {
-                    target: rightButton
-                    enabled: true
-                    textColor: palette.buttonText
-                    text: qsTr("Stop")
-                    onClicked: drives.selected.cancel()
                 }
             },
             State {
@@ -365,6 +361,18 @@ Dialog {
                                 width: parent.width
                                 progressColor: "#54aada"
                                 value: 0.0
+                            }
+                        }
+                        AdwaitaCheckBox {
+                            id: persistentStorage
+                            enabled: [Variant.WRITING, Variant.WRITE_VERIFYING].indexOf(releases.variant.status) < 0
+                            checked: false
+                            text: qsTr("Enable persistent storage")
+                            tooltip: qsTr("May take a lot longer")
+                            onCheckedChanged: {
+                                if (drives.selected) {
+                                    drives.selected.persistentStorage(checked)
+                                }
                             }
                         }
                         AdwaitaCheckBox {
