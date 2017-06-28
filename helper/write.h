@@ -17,24 +17,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef RESTOREJOB_H
-#define RESTOREJOB_H
+#ifndef WRITE_H
+#define WRITE_H
 
-#include <QObject>
-#include <QTextStream>
+#include <QString>
 
-class RestoreJob : public QObject
-{
-    Q_OBJECT
-public:
-    explicit RestoreJob(const QString &where);
-public slots:
-    void work();
-private:
-    QTextStream out { stdout };
-    QTextStream err { stderr };
+// Platform specific drive handler.
+#include "drive.h"
 
-    QString where;
-};
+#ifndef MEDIAWRITER_LZMA_LIMIT
+// 256MB memory limit for the decompressor
+#define MEDIAWRITER_LZMA_LIMIT (1024 * 1024 * 256)
+#endif
 
-#endif // RESTOREJOB_H
+void write(const QString &source, Drive *const drive, bool persistentStorage = false);
+
+#endif // WRITE_H

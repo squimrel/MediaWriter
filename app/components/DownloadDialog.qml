@@ -61,6 +61,9 @@ Dialog {
         target: drives
         onSelectedChanged: {
             writeImmediately.checked = false
+            if (drives.selected) {
+                drives.selected.persistentStorage(persistentStorage.checked)
+            }
         }
     }
 
@@ -69,6 +72,8 @@ Dialog {
         onStatusChanged: {
             if ([Variant.FINISHED, Variant.FAILED, Variant.FAILED_DOWNLOAD].indexOf(releases.variant.status) >= 0)
                 writeImmediately.checked = false
+            else if (drives.selected && writeImmediately.checked && releases.variant.status === Variant.READY)
+                drives.selected.write(releases.variant)
         }
     }
 
@@ -167,13 +172,6 @@ Dialog {
                     target: progressBar;
                     value: drives.selected.progress.ratio;
                     progressColor: Qt.lighter("green")
-                }
-                PropertyChanges {
-                    target: rightButton
-                    enabled: true
-                    textColor: palette.buttonText
-                    text: qsTr("Stop")
-                    onClicked: drives.selected.cancel()
                 }
             },
             State {
@@ -366,6 +364,18 @@ Dialog {
                             }
                         }
                         AdwaitaCheckBox {
+                            id: persistentStorage
+                            enabled: [Variant.WRITING, Variant.WRITE_VERIFYING].indexOf(releases.variant.status) < 0
+                            checked: false
+                            text: qsTr("Enable persistent storage")
+                            tooltip: qsTr("May take a lot longer")
+                            onCheckedChanged: {
+                                if (drives.selected) {
+                                    drives.selected.persistentStorage(checked)
+                                }
+                            }
+                        }
+                        AdwaitaCheckBox {
                             id: writeImmediately
                             enabled: driveCombo.count && opacity > 0.0
                             opacity: (releases.variant.status == Variant.DOWNLOADING || (releases.variant.status == Variant.DOWNLOAD_VERIFYING && releases.variant.progress.ratio < 0.95)) ? 1.0 : 0.0
@@ -373,8 +383,6 @@ Dialog {
                             onCheckedChanged: {
                                 if (drives.selected) {
                                     drives.selected.cancel()
-                                    if (checked)
-                                        drives.selected.write(releases.variant)
                                 }
                             }
                         }

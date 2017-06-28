@@ -17,30 +17,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <QCoreApplication>
+#ifndef DRIVE_H
+#define DRIVE_H
+
+#include <memory>
+#include <utility>
+
+#include <QDBusInterface>
+#include <QDBusUnixFileDescriptor>
+#include <QString>
 #include <QTextStream>
-#include <QTranslator>
+#include <QtGlobal>
 
-#include "restorejob.h"
-#include "writejob.h"
+class Drive {
+public:
+    /**
+     * Shared public interface across platforms.
+     */
+    Drive(const QString &driveIdentifier);
+    void open();
+    void close();
+    void write(const void *buffer, std::size_t size);
+    int getDescriptor() const;
+    void wipe();
+    QPair<QString, qint64> addPartition(quint64 offset = 0ULL, const QString &label = "");
+    QString mount(const QString &partitionIdentifier);
+    void umount();
 
-int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
+private:
+    QDBusUnixFileDescriptor m_fileDescriptor;
+    QString m_identifier;
+    std::unique_ptr<QDBusInterface> m_device;
+    QString m_path;
+};
 
-    QTranslator translator;
-    translator.load(QLocale(), QString(), QString(), ":/translations");
-    app.installTranslator(&translator);
-
-    if (app.arguments().count() == 3 && app.arguments()[1] == "restore") {
-        new RestoreJob(app.arguments()[2]);
-    }
-    else if (app.arguments().count() == 4 && app.arguments()[1] == "write") {
-        new WriteJob(app.arguments()[2], app.arguments()[3]);
-    }
-    else {
-        QTextStream err(stderr);
-        err << "Helper: Wrong arguments entered";
-        return 1;
-    }
-    return app.exec();
-}
+#endif // DRIVE_H
