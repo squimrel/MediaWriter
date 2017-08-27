@@ -31,7 +31,8 @@
 int main(int argc, char *argv[]) {
     const QString action = argv[1];
     bool isRestore = argc == 3 && action == "restore";
-    bool isWrite = argc == 4 && action == "write";
+    bool persistentStorage = argc == 5;
+    bool isWrite = (argc == 4 || persistentStorage) && action == "write";
     QTextStream err(stderr);
     if (!isRestore && !isWrite) {
         err << "Helper: Wrong arguments entered\n";
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
                 drive->wipe();
             }
             else {
-                drive->writeIso(argv[2]);
+                drive->writeIso(argv[2], persistentStorage);
             }
             qApp->exit(0);
         } catch (std::runtime_error &error) {

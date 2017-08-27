@@ -31,6 +31,7 @@
 #include <libimplantisomd5.h>
 #include <lzma.h>
 
+#include "blockdevice.h"
 #include "page_aligned_buffer.h"
 #include "write.h"
 
@@ -176,8 +177,33 @@ void GenericDrive::implantChecksum() {
     }
 }
 
-void GenericDrive::writeIso(const QString &source) {
+void GenericDrive::addOverlay(quint64 offset, quint64 size) {
+    BlockDevice device(getDescriptor());
+    device.read();
+    device.addPartition(offset, size);
+    device.formatOverlayPartition(offset, size);
+}
+
+void GenericDrive::writeIso(const QString &source, bool persistentStorage) {
+    auto sourceFile = source.toStdString();
+    if (::changePersistentStorage(sourceFile, persistentStorage)) {
+        char *errstr;
+        if (::implantISOFile(sourceFile.c_str(), false, true, true, &errstr) != 0) {
+            throw std::runtime_error(std::string(errstr));
+        }
+    }
     umount();
     writeFile(source);
     checkChecksum();
+    if (persistentStorage) {
+        umount();
+        QTextStream out(stdout);
+        out << "OVERLAY\n";
+        out.flush();
+        auto size = QFileInfo(source).size();
+        addOverlayPartition(size);
+        implantChecksum();
+        out << "DONE\n";
+        out.flush();
+    }
 }

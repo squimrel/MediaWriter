@@ -396,6 +396,9 @@ void Drive::setRestoreStatus(Drive::RestoreStatus o) {
 QStringList Drive::writeArgs(const ReleaseVariant &releaseVariant) {
     QStringList args;
     args << "write" << releaseVariant.iso() << m_device;
+    if (m_persistentStorage) {
+        args << "true";
+    }
     return args;
 }
 
@@ -409,7 +412,7 @@ void Drive::onReadyRead() {
     if (!m_process)
         return;
 
-    if (m_image->status() != ReleaseVariant::WRITE_VERIFYING && m_image->status() != ReleaseVariant::WRITING)
+    if (m_image->status() != ReleaseVariant::WRITE_VERIFYING && m_image->status() != ReleaseVariant::WRITING && m_image->status() != ReleaseVariant::WRITING_OVERLAY)
         m_image->setStatus(ReleaseVariant::WRITING);
 
     m_progress->setTo(10000);
@@ -420,6 +423,11 @@ void Drive::onReadyRead() {
             qDebug() << metaObject()->className() << "Written media check starting";
             m_progress->setValue(0.0 / 0.0);
             m_image->setStatus(ReleaseVariant::WRITE_VERIFYING);
+        }
+        else if (line == "OVERLAY") {
+            qDebug() << metaObject()->className() << "Starting to create the overlay partition";
+            m_progress->setValue(0.0 / 0.0);
+            m_image->setStatus(ReleaseVariant::WRITING_OVERLAY);
         }
         else {
             bool ok;

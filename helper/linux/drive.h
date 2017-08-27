@@ -44,6 +44,7 @@ public:
     void write(const void *buffer, std::size_t size);
     int getDescriptor() const;
     void wipe();
+    void addOverlayPartition(quint64 offset);
     void umount();
 
 private:

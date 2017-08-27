@@ -142,6 +142,10 @@ void Drive::wipe() {
         throw std::runtime_error(message.toStdString());
 }
 
+void Drive::addOverlayPartition(quint64 offset) {
+    addOverlay(offset, m_geometry.DiskSize.QuadPart - offset);
+}
+
 /**
  * Currently unused because it doesn't work correctly.
  */

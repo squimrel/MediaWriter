@@ -2,8 +2,8 @@ TEMPLATE = app
 
 QT += core
 
-LIBS += -lcheckisomd5 -limplantisomd5
-PKGCONFIG += isomd5sum
+LIBS += -lcheckisomd5 -limplantisomd5 -liso9660io
+PKGCONFIG += isomd5sum iso9660io
 
 CONFIG += c++11
 CONFIG += console
@@ -17,9 +17,9 @@ include($$top_srcdir/deployment.pri)
 target.path = $$LIBEXECDIR
 INSTALLS += target
 
-SOURCES = main.cpp genericdrive.cpp write.cpp
+SOURCES = main.cpp write.cpp blockdevice.cpp genericdrive.cpp
 
-HEADERS += genericdrive.h write.h
+HEADERS += write.h blockdevice.h genericdrive.h
 
 linux {
     include(linux/linux.pri)

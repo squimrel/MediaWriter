@@ -30,5 +30,6 @@ struct ProgressStats {
 };
 
 int onProgress(void *data, long long offset, long long total);
+bool changePersistentStorage(const std::string &filename, bool persistentStorage);
 
 #endif // WRITE_H

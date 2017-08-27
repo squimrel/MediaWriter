@@ -77,6 +77,10 @@ void Drive::wipe() {
     }
 }
 
+void Drive::addOverlayPartition(quint64 offset) {
+    addOverlay(offset, m_device->size() - offset);
+}
+
 /**
  * Unmount all partitions of drive.
  */

@@ -141,6 +141,7 @@ class Drive : public QObject {
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(uint64_t size READ size CONSTANT)
     Q_PROPERTY(RestoreStatus restoreStatus READ restoreStatus NOTIFY restoreStatusChanged)
+    Q_PROPERTY(bool persistentStorage MEMBER m_persistentStorage);
 public:
     enum RestoreStatus {
         CLEAN = 0,
@@ -192,6 +193,7 @@ protected:
     uint64_t m_size { 0 };
     RestoreStatus m_restoreStatus { CLEAN };
     QString m_error { };
+    bool m_persistentStorage { false };
     QProcess *m_process { nullptr };
 };
 

@@ -97,6 +97,10 @@ void Drive::wipe() {
     }
 }
 
+void Drive::addOverlayPartition(quint64 offset) {
+    addOverlay(offset, m_device->property("Size").toULongLong() - offset);
+}
+
 /**
  * Unmount all partitions managed by udisks.
  */
