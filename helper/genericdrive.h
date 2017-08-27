@@ -36,6 +36,7 @@ public:
     void writeFile(const QString& source);
     void writeIso(const QString& source);
     void checkChecksum();
+    void implantChecksum();
 };
 
 #endif // GENERICDRIVE_H

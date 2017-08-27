@@ -2,10 +2,12 @@ TEMPLATE = app
 
 QT += core
 
-LIBS += -lisomd5
+LIBS += -lcheckisomd5 -limplantisomd5
+PKGCONFIG += isomd5sum
 
 CONFIG += c++11
 CONFIG += console
+CONFIG += link_pkgconfig
 
 TARGET = helper
 DESTDIR = ../app/

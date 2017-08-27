@@ -27,7 +27,8 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include "isomd5/libcheckisomd5.h"
+#include <libcheckisomd5.h>
+#include <libimplantisomd5.h>
 #include <lzma.h>
 
 #include "page_aligned_buffer.h"
@@ -165,6 +166,13 @@ void GenericDrive::checkChecksum() {
         throw std::runtime_error("Your drive is probably damaged.");
     default:
         throw std::runtime_error("Unexpected error occurred during media check.");
+    }
+}
+
+void GenericDrive::implantChecksum() {
+    char *errstr;
+    if (::implantISOFD(getDescriptor(), false, true, true, &errstr) != 0) {
+        throw std::runtime_error(std::string(errstr));
     }
 }
 
